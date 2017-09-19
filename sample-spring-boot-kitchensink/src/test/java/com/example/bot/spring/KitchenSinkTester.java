@@ -60,6 +60,15 @@ public class KitchenSinkTester {
 			thrown = true;
 		}
 		assertThat(thrown);
+
+		//new test
+		thrown = false;
+		try {
+			this.databaseEngine.search("yes");
+		} catch (Exception e) {
+			thrown = true;
+		}
+		assertThat(thrown);
 	}
 	
 	@Test
@@ -73,5 +82,16 @@ public class KitchenSinkTester {
 		}
 		assertThat(!thrown);
 		assertThat(result.equals("def"));
+		
+		//new test
+		thrown = false;
+		result = null;
+		try {
+			result = this.databaseEngine.search("Hi");
+		} catch (Exception e) {
+			thrown = true;
+		}
+		assertThat(!thrown);
+		assertThat(result.equals("Hey, how things going?"));
 	}
 }
