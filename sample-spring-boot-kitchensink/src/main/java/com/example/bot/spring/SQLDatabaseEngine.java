@@ -18,11 +18,30 @@ public class SQLDatabaseEngine extends DatabaseEngine {
 		
 		String result = null;
 
+		BufferedReader br = null;
+		InputStreamReader isr = null;
+
 		try {
+			
+			isr = new InputStreamReader(
+                    this.getClass().getResourceAsStream(FILENAME));
+			br = new BufferedReader(isr);
+			String sCurrentLine;
+			
+			while ((sCurrentLine = br.readLine()) != null) {
+				String[] parts = sCurrentLine.split(":");
+				if (text.toLowerCase().equals(parts[0].toLowerCase())) {
+					result = parts[1];
+				}
+			}
+			
+			
+			
 			Connection connection = getConnection();
 			PreparedStatement stmt = connection.prepareStatement("SELECT keyword, response FROM conversation where keyword like concat(?,'%')");
 			stmt.setString(1,text);
 			ResultSet rs = stmt.executeQuery();
+			
 			while (rs.next()) {
 				
 				if (text.toLowerCase().equals(rs.getString(1).toLowerCase())) {
@@ -35,13 +54,24 @@ public class SQLDatabaseEngine extends DatabaseEngine {
 			connection.close();
 		} catch (Exception e) {
 			System.out.println(e);
-		} 
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (isr != null)
+					isr.close();
+			} catch (IOException ex) {
+				log.info("IOException while closing file: {}", ex.toString());
+			}
+		}
 		
 		if (result != null)
 			return result;
 		throw new Exception("NOT FOUND");
 		
 	}
+	
+	private final String FILENAME = "/static/database.txt";
 	
 	
 	private Connection getConnection() throws URISyntaxException, SQLException {
